@@ -1,0 +1,123 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1rem;
+  text-align: center;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 2.1em;
+  margin: 10px 0;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+  background-color: #363333;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+.info-block {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 30px;
+  width: 100%;
+}
+
+.info-block > p {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  flex-direction: column;
+  text-align: justify;
+  gap: 4px;
+}
+
+.info-block > p > span {
+  text-align: justify;
+  color: #000;
+  padding: 5px 5px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.info-block p:nth-child(1) span {
+  background-color: #e6ffe6; /* Light Green */
+}
+
+.info-block p:nth-child(2) span {
+  background-color: #ffffe6; /* Light Yellow */
+}
+
+.info-block p:nth-child(3) span {
+  background-color: #ffe6e6; /* Light Pink */
+}
+
+.info-block p:nth-child(4) span {
+  background-color: #f0f8ff; /* Light Alice Blue */
+}
+
+.map-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+}
