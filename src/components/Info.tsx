@@ -2,7 +2,8 @@ export const Info = () => {
   return (
     <div className='info-container'>
       <div>
-        <h1>Map Controllers guide</h1>
+        <h1>Markiian Kostiv Viso front-end task</h1>
+        <h3>Map Controllers guide</h3>
       </div>
       <div className='info-block'>
         <p>

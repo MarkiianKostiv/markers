@@ -1,4 +1,3 @@
-import "./App.css";
 import { Info } from "./components/Info";
 import { Map } from "./components/Map";
 function App() {

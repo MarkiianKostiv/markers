@@ -10,6 +10,6 @@ export const createCustomMarkerIcon = (text: string) => {
   return {
     url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
     scaledSize: new window.google.maps.Size(50, 60),
-    anchor: new window.google.maps.Point(25, 55),
+    anchor: new window.google.maps.Point(25, 45),
   };
 };

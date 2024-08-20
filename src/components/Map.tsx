@@ -1,11 +1,13 @@
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { GoogleMap, LoadScript } from "@react-google-maps/api";
 import { libraries } from "../enums/libraries";
 import { startingPoint } from "../enums/starting_point";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MarkerService } from "../services/markerService";
 import { IMarker } from "../interfaces/IMarker";
 import { createCustomMarkerIcon } from "./CustomMarker";
 import { mapContainer } from "../enums/mapContainer";
+import { MarkerClusterer } from "@googlemaps/markerclusterer";
+import Loader from "./Loader";
 
 const googleMapsKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
@@ -13,12 +15,54 @@ const markerService = new MarkerService();
 
 export const Map = () => {
   const [markers, setMarkers] = useState<{ id: string; data: IMarker }[]>([]);
+  const [isLoading, setIsLoading] = useState(true); // Manage loading state
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const markerClusterRef = useRef<MarkerClusterer | null>(null);
+  const markerRefs = useRef<google.maps.Marker[]>([]);
 
   useEffect(() => {
     markerService.getAllMarkers((markersList) => {
       setMarkers(markersList);
     });
   }, []);
+
+  useEffect(() => {
+    if (mapRef.current) {
+      if (markerClusterRef.current) {
+        markerClusterRef.current.clearMarkers();
+      }
+
+      markerRefs.current = markers.map((marker) => {
+        return new google.maps.Marker({
+          position: {
+            lat: marker.data.location._lat,
+            lng: marker.data.location._long,
+          },
+          icon: createCustomMarkerIcon(`${marker.data.quest}`),
+          map: mapRef.current!,
+          draggable: true,
+        });
+      });
+
+      markerClusterRef.current = new MarkerClusterer({
+        map: mapRef.current,
+        markers: markerRefs.current,
+      });
+
+      markerRefs.current.forEach((markerInstance, index) => {
+        markerInstance.addListener(
+          "dragend",
+          (event: google.maps.MapMouseEvent) => {
+            handleMarkerDragEnd(markers[index].id, event);
+          }
+        );
+
+        markerInstance.addListener("rightclick", () => {
+          handleDeleteMarker(markers[index].id);
+        });
+      });
+    }
+  }, [markers]);
 
   const handleMapClick = (event: google.maps.MapMouseEvent) => {
     if (event.latLng) {
@@ -28,7 +72,6 @@ export const Map = () => {
           _lat: event.latLng.lat(),
           _long: event.latLng.lng(),
         },
-        next: "",
         timestamp: new Date(),
       };
 
@@ -59,8 +102,14 @@ export const Map = () => {
     setMarkers([]);
   };
 
+  const handleMapLoad = (map: google.maps.Map) => {
+    mapRef.current = map;
+    setIsLoading(false); // Set loading to false when map has loaded
+  };
+
   return (
     <div className='map-item'>
+      {isLoading && <Loader />} {/* Show Loader while loading */}
       <LoadScript
         googleMapsApiKey={googleMapsKey}
         libraries={libraries}
@@ -72,23 +121,12 @@ export const Map = () => {
           center={startingPoint}
           zoom={10}
           onClick={handleMapClick}
-        >
-          {markers.map((marker) => (
-            <Marker
-              key={marker.id}
-              position={{
-                lat: marker.data.location._lat,
-                lng: marker.data.location._long,
-              }}
-              draggable={true}
-              onDragEnd={(event) => handleMarkerDragEnd(marker.id, event)}
-              onRightClick={() => handleDeleteMarker(marker.id)}
-              icon={createCustomMarkerIcon(`${marker.data.quest}`)}
-            />
-          ))}
-        </GoogleMap>
+          onLoad={handleMapLoad}
+        ></GoogleMap>
       </LoadScript>
-      <button onClick={handleDeleteAllMarkers}>Delete All Markers</button>
+      {!isLoading && (
+        <button onClick={handleDeleteAllMarkers}>Delete All Markers</button>
+      )}
     </div>
   );
 };
