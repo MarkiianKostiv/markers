@@ -1,6 +1,6 @@
 import { GoogleMap, LoadScript } from "@react-google-maps/api";
 import { libraries } from "../enums/libraries";
-import { startingPoint } from "../enums/starting_point";
+import { startingPoint } from "../enums/startingPoint";
 import { useEffect, useRef, useState } from "react";
 import { MarkerService } from "../services/markerService";
 import { IMarker } from "../interfaces/IMarker";
@@ -15,7 +15,7 @@ const markerService = new MarkerService();
 
 export const Map = () => {
   const [markers, setMarkers] = useState<{ id: string; data: IMarker }[]>([]);
-  const [isLoading, setIsLoading] = useState(true); // Manage loading state
+  const [isLoading, setIsLoading] = useState(true);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerClusterRef = useRef<MarkerClusterer | null>(null);
   const markerRefs = useRef<google.maps.Marker[]>([]);
@@ -72,6 +72,7 @@ export const Map = () => {
           _lat: event.latLng.lat(),
           _long: event.latLng.lng(),
         },
+        next: "",
         timestamp: new Date(),
       };
 
@@ -104,12 +105,12 @@ export const Map = () => {
 
   const handleMapLoad = (map: google.maps.Map) => {
     mapRef.current = map;
-    setIsLoading(false); // Set loading to false when map has loaded
+    setIsLoading(false);
   };
 
   return (
     <div className='map-item'>
-      {isLoading && <Loader />} {/* Show Loader while loading */}
+      {isLoading && <Loader />}
       <LoadScript
         googleMapsApiKey={googleMapsKey}
         libraries={libraries}

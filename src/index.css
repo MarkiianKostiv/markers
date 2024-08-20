@@ -126,6 +126,14 @@ button:focus-visible {
   gap: 10px;
 }
 
+.loader-container {
+  width: 500px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .loader {
   width: 50px;
   --b: 8px;

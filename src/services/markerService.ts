@@ -2,11 +2,12 @@ import {
   collection,
   onSnapshot,
   addDoc,
-  deleteDoc,
   doc,
   getDocs,
   writeBatch,
   updateDoc,
+  DocumentSnapshot,
+  DocumentData,
 } from "firebase/firestore";
 import db from "../db_config/firebaseConfig";
 import { IMarker } from "../interfaces/IMarker";
@@ -24,7 +25,29 @@ export class MarkerService {
 
   async createMarker(marker: IMarker) {
     try {
-      await addDoc(collection(db, "markers"), marker);
+      const markersCollection = collection(db, "markers");
+
+      const snapshot = await getDocs(markersCollection);
+      let lastMarkerDoc = null;
+
+      snapshot.forEach((docSnapshot) => {
+        const data = docSnapshot.data() as IMarker;
+        if (!data.next) {
+          lastMarkerDoc = docSnapshot;
+        }
+      });
+
+      const batch = writeBatch(db);
+
+      const newMarkerRef = await addDoc(markersCollection, marker);
+
+      if (lastMarkerDoc) {
+        batch.update((lastMarkerDoc as DocumentSnapshot<DocumentData>).ref, {
+          next: newMarkerRef.id,
+        });
+      }
+
+      await batch.commit();
     } catch (error) {
       console.error("Error adding marker: ", error);
     }
@@ -32,7 +55,34 @@ export class MarkerService {
 
   async deleteMarker(markerId: string) {
     try {
-      await deleteDoc(doc(db, "markers", markerId));
+      const markersCollection = collection(db, "markers");
+
+      const snapshot = await getDocs(markersCollection);
+      let previousMarkerDoc: DocumentSnapshot<DocumentData> | null = null;
+      let nextMarkerId: string | null = null;
+
+      snapshot.forEach((docSnapshot) => {
+        const data = docSnapshot.data() as IMarker;
+        if (data.next === markerId) {
+          previousMarkerDoc = docSnapshot;
+        }
+        if (docSnapshot.id === markerId) {
+          nextMarkerId = data.next;
+        }
+      });
+
+      const batch = writeBatch(db);
+
+      batch.delete(doc(db, "markers", markerId));
+
+      if (previousMarkerDoc) {
+        batch.update(
+          (previousMarkerDoc as DocumentSnapshot<DocumentData>).ref,
+          { next: nextMarkerId }
+        );
+      }
+
+      await batch.commit();
     } catch (error) {
       console.error("Error deleting marker: ", error);
     }

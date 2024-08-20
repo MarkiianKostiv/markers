@@ -1,6 +1,6 @@
 export interface IMarker {
   quest: number;
   location: { _lat: number; _long: number };
-  // next: string;
+  next: string | null;
   timestamp: Date;
 }
